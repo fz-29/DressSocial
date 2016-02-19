@@ -4,6 +4,7 @@ from login.models import fbUser
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods,require_GET,require_POST
 from django.http import HttpResponse,JsonResponse
+from django.core import serializers
 # Create your views here.
 @csrf_exempt
 @require_POST
@@ -26,7 +27,47 @@ def update(request):
 		response_data["success"]="1"
 		return JsonResponse(response_data)
 
-# def provide(request):
+@csrf_exempt
+@require_POST
+def giveTop(request):
+	response_data={}
+	fbid = request.POST["fbid"]
+	try :
+		fbObj = fbUser.objects.get(fbid = fbid)
+		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'top')
+	except:
+		response_data["success"] = "0"
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		#jsonObj = serializers.serialize("json", topObjs)
+		tops = []
+		for itero in topObjs:
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+		response_data["tops"] = tops
+		return JsonResponse(response_data)
+
+@csrf_exempt
+@require_POST
+def giveBottom(request):
+	response_data={}
+	fbid = request.POST["fbid"]
+	try :
+		fbObj = fbUser.objects.get(fbid = fbid)
+		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'bottom')
+	except:
+		response_data["success"] = "0"
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		
+		tops = []
+		for itero in topObjs:
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+		response_data["bottoms"] = tops
+		return JsonResponse(response_data)
+
+
 
 @csrf_exempt
 @require_POST
