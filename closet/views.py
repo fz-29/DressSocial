@@ -67,6 +67,45 @@ def giveBottom(request):
 		response_data["bottoms"] = tops
 		return JsonResponse(response_data)
 
+@csrf_exempt
+@require_POST
+def giveFoot(request):
+	response_data={}
+	fbid = request.POST["fbid"]
+	try :
+		fbObj = fbUser.objects.get(fbid = fbid)
+		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'foot')
+	except:
+		response_data["success"] = "0"
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		
+		tops = []
+		for itero in topObjs:
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+		response_data["foot"] = tops
+		return JsonResponse(response_data)
+
+@csrf_exempt
+@require_POST
+def giveAcc(request):
+	response_data={}
+	fbid = request.POST["fbid"]
+	try :
+		fbObj = fbUser.objects.get(fbid = fbid)
+		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'acc')
+	except:
+		response_data["success"] = "0"
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		
+		tops = []
+		for itero in topObjs:
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+		response_data["acc"] = tops
+		return JsonResponse(response_data)
 
 
 @csrf_exempt
@@ -88,10 +127,29 @@ def addCombination(request):
 		# bottomObj = Wardrobe.objects.get(id=bottomid)
 		# footObj = Wardrobe.objects.get(id=footid)
 		# accObj = Wardrobe.objects.get(id=accid)
-		Combination.objects.create(fbuser=fbObj ,combinationName=combinationName ,trend= trend , topLink = top,bottomLink = bottom ,footLink = foot,accLink= acc, access = access)
+		Combination.objects.create(fbuser=fbObj, combinationName=combinationName ,trend= trend , topLink = top,bottomLink = bottom ,footLink = foot,accLink= acc, access = access)
 	except:
 		response_data["success"] = "0"
 		return JsonResponse(response_data)
 	else:
 		response_data["success"] = "1"
+		return JsonResponse(response_data)
+
+@csrf_exempt
+@require_POST
+def getCombination(request):
+	response_data = {}
+	fbid = request.POST["fbid"]
+	try :
+		fbObj = fbUser.objects.get(fbid=fbid)
+		combinationsObj = Combination.objects.filter(fbuser=fbObj)
+	except:
+		response_data["success"] = "0"
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		combs = []
+		for itero in combinationsObj:
+			combs += [{ 'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink, "foot" : itero.footLink, "acc" : itero.accLink }]
+		response_data["acc"] = combs
 		return JsonResponse(response_data)
