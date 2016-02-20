@@ -4,7 +4,8 @@ from login.models import fbUser
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods,require_GET,require_POST
 from django.http import HttpResponse,JsonResponse
-from django.core import serializers
+import datetime
+
 # Create your views here.
 @csrf_exempt
 @require_POST
@@ -137,6 +138,27 @@ def addCombination(request):
 
 @csrf_exempt
 @require_POST
+def wearToday(request):
+	response_data = {}
+	fbid = request.POST["fbid"]
+	combinationId = request.POST["combinationid"]
+	try :
+		fbObj = fbUser.objects.get(fbid=fbid)
+		# topObj = Wardrobe.objects.get(id=topid)
+		# bottomObj = Wardrobe.objects.get(id=bottomid)
+		# footObj = Wardrobe.objects.get(id=footid)
+		# accObj = Wardrobe.objects.get(id=accid)
+		Combination.objects.filter(fbuser= fbObj, id = int(combinationId)).update(date = datetime.date.today())
+	except Exception as e:		
+		response_data["success"]="0"
+		response_data["error"]=e
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		return JsonResponse(response_data)
+
+@csrf_exempt
+@require_POST
 def getCombination(request):
 	response_data = {}
 	fbid = request.POST["fbid"]
@@ -150,6 +172,27 @@ def getCombination(request):
 		response_data["success"] = "1"
 		combs = []
 		for itero in combinationsObj:
-			combs += [{ 'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink, "foot" : itero.footLink, "acc" : itero.accLink }]
+			combs += [{ 'id': itero.id ,'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink, "foot" : itero.footLink, "acc" : itero.accLink }]
+		response_data["acc"] = combs
+		return JsonResponse(response_data)
+
+@csrf_exempt
+@require_POST
+def getFriendCombination(request):
+	response_data = {}
+	fbid = request.POST["fbid"]
+	friend = request.POST["friend"]
+	try :
+		fbObj = fbUser.objects.get(fbid=fbid)
+		friendObj = fbUser.objects.get(fbid=friend)
+		combinationsObj = Combination.objects.filter(fbuser=friendObj, date = datetime.date.today())
+	except:
+		response_data["success"] = "0"
+		return JsonResponse(response_data)
+	else:
+		response_data["success"] = "1"
+		combs = []
+		for itero in combinationsObj:
+			combs += [{ 'id': itero.id ,'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink, "foot" : itero.footLink, "acc" : itero.accLink }]
 		response_data["acc"] = combs
 		return JsonResponse(response_data)

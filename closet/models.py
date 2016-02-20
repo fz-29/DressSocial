@@ -21,7 +21,7 @@ class Combination(models.Model):
 	footLink = models.CharField(max_length=2000,null=True)
 	accLink = models.CharField(max_length=2000,null=True)
 	access = models.IntegerField()
-
+	date = models.DateField(null=True)
 	def __unicode__(self):
 		return self.combinationName
 	

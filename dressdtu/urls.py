@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from login.views import fblogin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/',include('login.urls')),
     url(r'^closet/',include('closet.urls')),
+     url(r'^friend/',include('friend.urls')),
     #url(r'^login/$', 'login.views.fblogin'),
 ]

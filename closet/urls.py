@@ -7,5 +7,7 @@ urlpatterns=[
 	url(r'^acc/$','closet.views.giveAcc',name='addAcc'),
 	url(r'^addFav/$','closet.views.addCombination',name='addFav'),
 	url(r'^getFav/$','closet.views.getCombination',name='getFav'),
-
+	url(r'^wearToday/$','closet.views.wearToday',name='wearToday'),
+	url(r'^getFriendFav/$','closet.views.getFriendCombination',name='getFriendFav'),
+	#url(r'^getFriendToday/$','closet.views.getFriendTodayCombination',name='getFriendToday'),
 ]
