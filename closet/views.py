@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Wardrobe, Combination
 from login.models import fbUser
+from friend.models import Friend
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods,require_GET,require_POST
 from django.http import HttpResponse,JsonResponse
@@ -45,7 +46,7 @@ def giveTop(request):
 		tops = []
 		for itero in topObjs:
 			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
-		response_data["tops"] = tops
+		response_data["top"] = tops
 		return JsonResponse(response_data)
 
 @csrf_exempt
@@ -65,7 +66,7 @@ def giveBottom(request):
 		tops = []
 		for itero in topObjs:
 			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
-		response_data["bottoms"] = tops
+		response_data["bottom"] = tops
 		return JsonResponse(response_data)
 
 @csrf_exempt
@@ -75,7 +76,7 @@ def giveFoot(request):
 	fbid = request.POST["fbid"]
 	try :
 		fbObj = fbUser.objects.get(fbid = fbid)
-		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'foot')
+		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'footwear')
 	except:
 		response_data["success"] = "0"
 		return JsonResponse(response_data)
@@ -108,6 +109,24 @@ def giveAcc(request):
 		response_data["acc"] = tops
 		return JsonResponse(response_data)
 
+def getShade(request):	
+	from colorthief import ColorThief
+	color_thief = ColorThief('images.jpg')
+	dominant_color = color_thief.get_color(quality=1)
+	palette=color_thief.get_palette(color_count=6)
+
+	comp_color={'green':'magenta','white':'black','blue':'red','red':'blue','black':'white'}
+
+	img1=cv2.imread(request.POST["image"],0)
+	ref=ColorThief(request.POST["image"])#ref image is the image being checked
+	dominant_color=ref.get_color(quality=1)
+	#print img1.shape
+	refR,refG,refB=dominant_color
+	#print refR,refG,refB
+	compR=255-refR
+	compG=255-refG
+	compB=255-refB
+	return dominant_color;
 
 @csrf_exempt
 @require_POST
@@ -119,8 +138,8 @@ def addCombination(request):
 	top = request.POST["topid"]
 	bottom = request.POST["bottomid"]
 	foot = request.POST["footid"]
-	acc = request.POST["accid"]
-	access = request.POST["access"]
+	# acc = request.POST["accid"]
+	access = int(request.POST["access"])
 
 	try :
 		fbObj = fbUser.objects.get(fbid=fbid)
@@ -128,7 +147,7 @@ def addCombination(request):
 		# bottomObj = Wardrobe.objects.get(id=bottomid)
 		# footObj = Wardrobe.objects.get(id=footid)
 		# accObj = Wardrobe.objects.get(id=accid)
-		Combination.objects.create(fbuser=fbObj, combinationName=combinationName ,trend= trend , topLink = top,bottomLink = bottom ,footLink = foot,accLink= acc, access = access)
+		Combination.objects.create(fbuser=fbObj, combinationName=combinationName ,trend= trend , topLink = top,bottomLink = bottom ,footLink = foot, access = access)
 	except:
 		response_data["success"] = "0"
 		return JsonResponse(response_data)
@@ -172,8 +191,8 @@ def getCombination(request):
 		response_data["success"] = "1"
 		combs = []
 		for itero in combinationsObj:
-			combs += [{ 'id': itero.id ,'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink, "foot" : itero.footLink, "acc" : itero.accLink }]
-		response_data["acc"] = combs
+			combs += [{ 'id': itero.id ,'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink , 'foot' : itero.footLink }]
+		response_data["data"] = combs
 		return JsonResponse(response_data)
 
 @csrf_exempt
@@ -181,18 +200,19 @@ def getCombination(request):
 def getFriendCombination(request):
 	response_data = {}
 	fbid = request.POST["fbid"]
-	friend = request.POST["friend"]
 	try :
 		fbObj = fbUser.objects.get(fbid=fbid)
-		friendObj = fbUser.objects.get(fbid=friend)
-		combinationsObj = Combination.objects.filter(fbuser=friendObj, date = datetime.date.today())
+		friendObj = Friend.objects.filter(fbuser=fbObj)
+		combinationsObj = [];
+		for itero in friendObj : 
+			friendComb = Combination.objects.filter(fbuser=itero, date = datetime.date.today())
+			dictn = {"name" : friendComb.fbuser , "top" : friendComb.topLink ,"foot" : friendComb.bottomLink ,"bottom" : friendComb.footLink }
+			combinationsObj.append(friendComb)
+			
 	except:
 		response_data["success"] = "0"
 		return JsonResponse(response_data)
 	else:
 		response_data["success"] = "1"
-		combs = []
-		for itero in combinationsObj:
-			combs += [{ 'id': itero.id ,'name' : itero.combinationName , 'top' : itero.topLink ,'bottom' : itero.bottomLink, "foot" : itero.footLink, "acc" : itero.accLink }]
-		response_data["acc"] = combs
+		response_data["data"] = combinationsObj
 		return JsonResponse(response_data)

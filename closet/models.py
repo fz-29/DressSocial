@@ -7,7 +7,7 @@ class Wardrobe(models.Model):
 	dressType = models.CharField(max_length=40,null=True)
 	image = models.CharField(max_length=3000,null=False,blank=False,unique=True,primary_key=True)
 	color = models.CharField(max_length=40,null=True)
-	access = models.IntegerField()
+	access = models.IntegerField(default = 0)
 
 	def __unicode__(self):
 		return self.dressName
@@ -20,7 +20,7 @@ class Combination(models.Model):
 	bottomLink = models.CharField(max_length=2000,null=True)
 	footLink = models.CharField(max_length=2000,null=True)
 	accLink = models.CharField(max_length=2000,null=True)
-	access = models.IntegerField()
+	access = models.IntegerField(default=0)
 	date = models.DateField(null=True)
 	def __unicode__(self):
 		return self.combinationName
