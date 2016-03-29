@@ -1,3 +1,7 @@
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import colorsys
 from django.shortcuts import render
 from .models import Wardrobe, Combination
 from login.models import fbUser
@@ -7,21 +11,24 @@ from django.views.decorators.http import require_http_methods,require_GET,requir
 from django.http import HttpResponse,JsonResponse
 import datetime
 
+
 # Create your views here.
 @csrf_exempt
 @require_POST
 def update(request):
+	'''To add new clothes'''
 	fbid = request.POST["fbid"]
 	dressName = request.POST["dressName"]
 	dressType = request.POST["dressType"]
 	image = request.POST["image"]
-	color = request.POST["color"]
+	url = request.POST["url"]
 	access = request.POST["access"]
 	response_data={}
 
+	color = "black"
 	try :
 		obj = fbUser.objects.get(fbid=fbid)
-		Wardrobe.objects.create(fbuser = obj,dressName=dressName, dressType=dressType,image=image, color= color, access= access)	
+		Wardrobe.objects.create(fbuser = obj,dressName=dressName, dressType=dressType,image=image, url = url, color= color, access= access)	
 	except:
 		response_data["success"]="0"
 		return JsonResponse(response_data)
@@ -32,6 +39,7 @@ def update(request):
 @csrf_exempt
 @require_POST
 def giveTop(request):
+	'''Fetch top'''
 	response_data={}
 	fbid = request.POST["fbid"]
 	try :
@@ -42,16 +50,16 @@ def giveTop(request):
 		return JsonResponse(response_data)
 	else:
 		response_data["success"] = "1"
-		#jsonObj = serializers.serialize("json", topObjs)
 		tops = []
 		for itero in topObjs:
-			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image, 'url' : itero.url }]
 		response_data["top"] = tops
 		return JsonResponse(response_data)
 
 @csrf_exempt
 @require_POST
 def giveBottom(request):
+	'''Fetch bottom'''
 	response_data={}
 	fbid = request.POST["fbid"]
 	try :
@@ -65,13 +73,14 @@ def giveBottom(request):
 		
 		tops = []
 		for itero in topObjs:
-			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image, 'url' : itero.url }]
 		response_data["bottom"] = tops
 		return JsonResponse(response_data)
 
 @csrf_exempt
 @require_POST
 def giveFoot(request):
+	'''Fetch Footwear'''
 	response_data={}
 	fbid = request.POST["fbid"]
 	try :
@@ -85,13 +94,14 @@ def giveFoot(request):
 		
 		tops = []
 		for itero in topObjs:
-			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image, 'url' : itero.url }]
 		response_data["foot"] = tops
 		return JsonResponse(response_data)
 
 @csrf_exempt
 @require_POST
 def giveAcc(request):
+	'''Fetch access'''
 	response_data={}
 	fbid = request.POST["fbid"]
 	try :
@@ -105,32 +115,18 @@ def giveAcc(request):
 		
 		tops = []
 		for itero in topObjs:
-			tops += [{ 'name' : itero.dressName, 'image' : itero.image }]
+			tops += [{ 'name' : itero.dressName, 'image' : itero.image, 'url' : itero.url }]
 		response_data["acc"] = tops
 		return JsonResponse(response_data)
 
-def getShade(request):	
-	from colorthief import ColorThief
-	color_thief = ColorThief('images.jpg')
-	dominant_color = color_thief.get_color(quality=1)
-	palette=color_thief.get_palette(color_count=6)
-
-	comp_color={'green':'magenta','white':'black','blue':'red','red':'blue','black':'white'}
-
-	img1=cv2.imread(request.POST["image"],0)
-	ref=ColorThief(request.POST["image"])#ref image is the image being checked
-	dominant_color=ref.get_color(quality=1)
-	#print img1.shape
-	refR,refG,refB=dominant_color
-	#print refR,refG,refB
-	compR=255-refR
-	compG=255-refG
-	compB=255-refB
-	return dominant_color;
+def getShade():
+	'''Find the shade of the clothes'''	
+	
 
 @csrf_exempt
 @require_POST
 def addCombination(request):
+	'''Add the combination into the databse from  DRESS SELECTOR activity '''
 	response_data = {}
 	fbid = request.POST["fbid"]
 	combinationName = request.POST["dressName"]
@@ -158,6 +154,7 @@ def addCombination(request):
 @csrf_exempt
 @require_POST
 def wearToday(request):
+	'''Update what user is wearing today'''
 	response_data = {}
 	fbid = request.POST["fbid"]
 	combinationId = request.POST["combinationid"]
@@ -179,6 +176,7 @@ def wearToday(request):
 @csrf_exempt
 @require_POST
 def getCombination(request):
+	'''Fetch all the combinations'''
 	response_data = {}
 	fbid = request.POST["fbid"]
 	try :
@@ -198,6 +196,7 @@ def getCombination(request):
 @csrf_exempt
 @require_POST
 def getFriendCombination(request):
+	''' Get friends combinations '''
 	response_data = {}
 	fbid = request.POST["fbid"]
 	try :

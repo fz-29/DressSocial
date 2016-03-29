@@ -6,6 +6,7 @@ class Wardrobe(models.Model):
 	dressName = models.CharField(max_length=50,null=True)
 	dressType = models.CharField(max_length=40,null=True)
 	image = models.CharField(max_length=3000,null=False,blank=False,unique=True,primary_key=True)
+	url = models.CharField(max_length=3000,null=True,blank=True,unique=True)
 	color = models.CharField(max_length=40,null=True)
 	access = models.IntegerField(default = 0)
 
