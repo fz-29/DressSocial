@@ -128,9 +128,6 @@ def giveAcc(request):
 		response_data["acc"] = tops
 		return JsonResponse(response_data)
 
-
-	
-
 @csrf_exempt
 @require_POST
 def addCombination(request):
@@ -204,22 +201,22 @@ def getCombination(request):
 @require_POST
 def getFriendCombination(request):
 	''' Get friends combinations '''
-	response_data = {}
-	fbid = request.POST["fbid"]
-	friendid = request.POST["friendid"]
-	try :
-		fbObj = fbUser.objects.get(fbid=fbid)
-		friendObj = Friend.objects.filter(fbuser=fbObj)
-		combinationsObj = [];
-		for itero in friendObj : 
-			friendComb = Combination.objects.filter(fbuser=itero, date = datetime.date.today())
-			dictn = {"name" : friendComb.fbuser , "top" : friendComb.topLink ,"foot" : friendComb.bottomLink ,"bottom" : friendComb.footLink }
-			combinationsObj.append(friendComb)
+	pass
+
+
+	# try :
+	# 	fbObj = fbUser.objects.get(fbid=fr)
+	# 	friendObj = Friend.objects.filter(fbuser=fbObj)
+	# 	combinationsObj = [];
+	# 	for itero in friendObj : 
+	# 		friendComb = Combination.objects.filter(fbuser=itero, date = datetime.date.today())
+	# 		dictn = {"name" : friendComb.fbuser , "top" : friendComb.topLink ,"foot" : friendComb.bottomLink ,"bottom" : friendComb.footLink }
+	# 		combinationsObj.append(friendComb)
 			
-	except:
-		response_data["success"] = "0"
-		return JsonResponse(response_data)
-	else:
-		response_data["success"] = "1"
-		response_data["data"] = combinationsObj
-		return JsonResponse(response_data)
+	# except:
+	# 	response_data["success"] = "0"
+	# 	return JsonResponse(response_data)
+	# else:
+	# 	response_data["success"] = "1"
+	# 	response_data["data"] = combinationsObj
+	# 	return JsonResponse(response_data)
