@@ -13,7 +13,7 @@ import datetime
 
 def getComplementary(image):
 	'''Find the shade of the clothes'''	
-	dom_color = cloudinary.api.resource("1459250092490", colors = True)['colors'][0][0]
+	dom_color = cloudinary.api.resource(image, colors = True)['colors'][0][0]
 	comp_color={'green':'magenta','white':'black','blue':'red','red':'blue','black':'white'}
 	return (dom_color,"black")
 
@@ -94,6 +94,7 @@ def giveFoot(request):
 		fbObj = fbUser.objects.get(fbid = fbid)
 		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'footwear')
 	except:
+		print 
 		response_data["success"] = "0"
 		return JsonResponse(response_data)
 	else:
@@ -111,7 +112,8 @@ def giveAcc(request):
 	'''Fetch access'''
 	response_data={}
 	fbid = request.POST["fbid"]
-	try :
+	try:
+
 		fbObj = fbUser.objects.get(fbid = fbid)
 		topObjs = Wardrobe.objects.filter(fbuser = fbObj, dressType = 'acc')
 	except:
@@ -184,11 +186,10 @@ def getCombination(request):
 	'''Fetch all the combinations'''
 	response_data = {}
 	fbid = request.POST["fbid"]
-	friendid = request.POST["friendid"]
 	try : 
-		fbObj = fbUser.objects.get(fbid=friendid)		
+		fbObj = fbUser.objects.get(fbid=fbid)		
 		combinationsObj = Combination.objects.filter(fbuser=fbObj)
-	except:
+	except Exception as e:
 		response_data["success"] = "0"
 		return JsonResponse(response_data)
 	else:
@@ -205,6 +206,7 @@ def getFriendCombination(request):
 	''' Get friends combinations '''
 	response_data = {}
 	fbid = request.POST["fbid"]
+	friendid = request.POST["friendid"]
 	try :
 		fbObj = fbUser.objects.get(fbid=fbid)
 		friendObj = Friend.objects.filter(fbuser=fbObj)
