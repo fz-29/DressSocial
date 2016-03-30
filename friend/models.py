@@ -4,7 +4,9 @@ from login.models import fbUser
 # Create your models here.
 class Friend(models.Model):
 	fbuser = models.ForeignKey(fbUser,on_delete=models.CASCADE)
-	friend = models.CharField(max_length=40,null=False,blank=False)
-	#friend = models.ManyToManyField(fbUser,related_name="friendOfUser")
+	friend = models.ManyToManyField(fbUser,related_name="friendOfUser")
+	#friend = models.CharField(max_length=40,null=False,blank=False)
+	
 	def __unicode__(self):
-		return self.friend
+		return unicode(self.friend)
+		#when you want to show foreign key, fetch the unicode for the foreign key

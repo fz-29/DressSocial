@@ -25,4 +25,3 @@ class Combination(models.Model):
 	date = models.DateField(null=True)
 	def __unicode__(self):
 		return self.combinationName
-	

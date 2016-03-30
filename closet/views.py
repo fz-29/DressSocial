@@ -11,6 +11,11 @@ from django.views.decorators.http import require_http_methods,require_GET,requir
 from django.http import HttpResponse,JsonResponse
 import datetime
 
+def getComplementary(image):
+	'''Find the shade of the clothes'''	
+	dom_color = cloudinary.api.resource("1459250092490", colors = True)['colors'][0][0]
+	comp_color={'green':'magenta','white':'black','blue':'red','red':'blue','black':'white'}
+	return (dom_color,"black")
 
 # Create your views here.
 @csrf_exempt
@@ -23,9 +28,10 @@ def update(request):
 	image = request.POST["image"]
 	url = request.POST["url"]
 	access = request.POST["access"]
-	response_data={}
-
+	#color,comp_color = getComplementary(image)
 	color = "black"
+	comp_color = "black"
+	response_data={}
 	try :
 		obj = fbUser.objects.get(fbid=fbid)
 		Wardrobe.objects.create(fbuser = obj,dressName=dressName, dressType=dressType,image=image, url = url, color= color, access= access)	
@@ -34,6 +40,7 @@ def update(request):
 		return JsonResponse(response_data)
 	else:
 		response_data["success"]="1"
+		response_data["comp_color"]=comp_color
 		return JsonResponse(response_data)
 
 @csrf_exempt
@@ -119,8 +126,7 @@ def giveAcc(request):
 		response_data["acc"] = tops
 		return JsonResponse(response_data)
 
-def getShade():
-	'''Find the shade of the clothes'''	
+
 	
 
 @csrf_exempt
@@ -136,7 +142,6 @@ def addCombination(request):
 	foot = request.POST["footid"]
 	# acc = request.POST["accid"]
 	access = int(request.POST["access"])
-
 	try :
 		fbObj = fbUser.objects.get(fbid=fbid)
 		# topObj = Wardrobe.objects.get(id=topid)
@@ -179,8 +184,9 @@ def getCombination(request):
 	'''Fetch all the combinations'''
 	response_data = {}
 	fbid = request.POST["fbid"]
-	try :
-		fbObj = fbUser.objects.get(fbid=fbid)
+	friendid = request.POST["friendid"]
+	try : 
+		fbObj = fbUser.objects.get(fbid=friendid)		
 		combinationsObj = Combination.objects.filter(fbuser=fbObj)
 	except:
 		response_data["success"] = "0"
