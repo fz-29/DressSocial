@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods,require_GET,require_POST
 from django.http import HttpResponse,JsonResponse
 import json
-
 @csrf_exempt
 @require_POST
 def addFriends(request):
@@ -31,7 +30,6 @@ def addFriends(request):
 	else:
 		response_data["success"]="1"
 		return JsonResponse(response_data)
-
 @csrf_exempt
 @require_POST
 def getFriends(request):

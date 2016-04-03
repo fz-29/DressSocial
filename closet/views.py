@@ -10,13 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods,require_GET,require_POST
 from django.http import HttpResponse,JsonResponse
 import datetime
-
-def getComplementary(image):
-	'''Find the shade of the clothes'''	
-	dom_color = cloudinary.api.resource(image, colors = True)['colors'][0][0]
-	comp_color={'green':'magenta','white':'black','blue':'red','red':'blue','black':'white'}
-	return (dom_color,"black")
-
 # Create your views here.
 @csrf_exempt
 @require_POST
@@ -200,6 +193,7 @@ def getCombination(request):
 @csrf_exempt
 @require_POST
 def getFriendCombination(request):
+	#CODER AT WORK
 	''' Get friends combinations '''
 	pass
 
@@ -220,3 +214,8 @@ def getFriendCombination(request):
 	# 	response_data["success"] = "1"
 	# 	response_data["data"] = combinationsObj
 	# 	return JsonResponse(response_data)
+def getComplementary(image):
+	'''Find the shade of the clothes'''	
+	dom_color = cloudinary.api.resource(image, colors = True)['colors'][0][0]
+	comp_color={'green':'magenta','white':'black','blue':'red','red':'blue','black':'white'}
+	return (dom_color,"black")
